@@ -66,7 +66,7 @@ parse = parseText(
 const result = parse.get(); //Return all rows
 /*
 	{
-	time:1,
+	Time: "0 ms",
 	header:["Index","User Id","First Name","Last Name","Sex"],
 	rows:[
 		["1","5f10e9D33fC5f2b","Sara","Mcguire","Female"],
@@ -97,7 +97,7 @@ result = parse.chunk(c)
 result = parse.chunk(2) //Return row 0 and 1 
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "1", "5f10e9D33fC5f2b", "Sara", "Mcguire", "Female" ],
@@ -110,7 +110,7 @@ result = parse.chunk(2) //Return row 0 and 1
 result = parse.chunk(3) //Return row 2,3 and 4 (Get rows from last offset saved)
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "3", "DcEFDB2D2e62bF9", "Gwendolyn", "Sheppard", "Male" ],
@@ -124,7 +124,7 @@ result = parse.chunk(3) //Return row 2,3 and 4 (Get rows from last offset saved)
 result = parse.chunk(1) //Return row 5 (Get rows from last offset saved)
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ]
@@ -151,7 +151,7 @@ result = parse.rowOffset(from,to)
 result = parse.rowOffset(6) //Returns all rows from the sixth row to the last row
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "7", "FCdfFf08196f633", "Collin", "Allison", "Male" ],
@@ -166,7 +166,7 @@ result = parse.rowOffset(6) //Returns all rows from the sixth row to the last ro
 result = parse.rowOffset(5,8) //Returns all rows from 5th to 8th row
 /*
 {
-  "Time": "1 ms",
+  Time: "1 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ],
@@ -196,7 +196,7 @@ result = parse.setRowOffset(5)
 result = parse.chunk(1) // Get rows from last offset saved
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ]
@@ -213,7 +213,7 @@ false
 result = parse.chunk(1) // Get rows from last offset saved
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
   "Rows": [
     [ "7", "FCdfFf08196f633", "Collin", "Allison", "Male" ]
@@ -268,7 +268,7 @@ option = {
 result = parse.rowOffset(2)
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": false,
   "Rows": [
     [ "2", "751cD1cbF77e005", "Alisha", "Hebert", "Male" ]
@@ -284,7 +284,7 @@ option = {
 	// delimiter: (String: get rows containing columns, false: get lines without columns)
 /*
 {
-  "Time": "0 ms",
+  Time: "0 ms",
   "Header": false,
   "Rows": [
     [ "2,751cD1cbF77e005,Alisha,Hebert,Male" ] // No columns, just string (all line)
