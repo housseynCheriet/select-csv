@@ -1,22 +1,19 @@
-Parse CSV with JavaScript
-========================================
+# select-csv
 
-It is the fastest, simplest and most powerful package of all existing libraries in npmjs. It converts .csv files into an array and even into lines. It contains two important functions parseCsv that handles a csv file, you only need a link to the file. And parseText deals with text, and they both have the same roles and and methods, and it comes with these features:
+The fastest, simplest, and most powerful CSV parser for Node.js. Optimized for high performance and extreme memory efficiency when handling massive datasets (100M+ rows).
 
-- Package with small content (< 30 KB)
-- Easy to use
-- Parse CSV files directly (local)
-- Fast mode
-- Stream large files
-- It is a synchronous package
-- Uses chunks
-- Uses row offset (get rows from line x to line x+n)
-- Returns rows (with columns) or lines (without columns)
-- No external dependencies
-- Flexible with lots of options (header, quote, line break, delimiter)
-- One of the only parsers that correctly handles line-breaks and quotations
+`select-csv` converts `.csv` files into arrays, JSON objects, or raw lines. It provides two main functions, `parseCsv` (for local files) and `parseText` (for raw strings), both sharing the same methods and features.
 
-select-csv has **no dependencies** .
+##  Key Features
+- **Ultra-Lightweight:** Package size is less than 30 KB.
+- **Fast Mode:** Synchronous execution for maximum speed and zero overhead.
+- **Memory Efficient:** Streams large files using chunks and row offsets instead of loading the entire file into RAM.
+- **Robust Parsing:** Correct handling of complex line-breaks (`\r\n`, `\n`) and nested quotations.
+- **No Dependencies:** Zero external dependencies for maximum security and stability.
+- **Flexible Options:** Highly customizable (headers, quotes, delimiters, buffers).
+
+---
+
 
 Install:
 -------
@@ -54,7 +51,11 @@ parse = parseText(
 7,FCdfFf08196f633,Collin,Allison,Male
 8,356279dAa0F7CbD,Nicholas,Branch,Male
 9,F563CcbFBfEcf5a,Emma,Robinson,Female
-10,f2dceFc00F62542,Pedro,Cordova,Male`
+10,f2dceFc00F62542,Pedro,Cordova,Male`,
+{ 
+    linebreak: '\n',
+    header: true 
+}
 );
 
 
@@ -447,3 +448,7 @@ result = parse.getInfo() // Get all the information
 }
 */
 ```
+
+## 📄 License
+
+MIT License

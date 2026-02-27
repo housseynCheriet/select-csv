@@ -1,0 +1,37 @@
+{
+  "name": "select-csv",
+  "version": "1.1.23",
+  "description": "A high-performance, memory-efficient CSV parser for Node.js. Supports streaming large files via chunks and row offsets with zero dependencies.",
+  "keywords": [
+    "csv",
+    "parser",
+    "parse",
+    "parsing",
+    "delimited",
+    "text",
+    "data",
+    "comma",
+    "tab",
+    "pipe",
+    "file",
+    "filereader",
+    "stream",
+    "chunk",
+    "line",
+    "fast-csv",
+    "large-file"
+  ],
+  "author": {
+    "name": "Housseyn Cheriet",
+    "url": "https://github.com/housseynCheriet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/housseynCheriet/select-csv"
+  },
+  "license": "MIT",
+  "main": "selectcsv.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
