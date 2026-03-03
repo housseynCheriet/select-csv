@@ -1,454 +1,191 @@
 # select-csv
 
-The fastest, simplest, and most powerful CSV parser for Node.js. Optimized for high performance and extreme memory efficiency when handling massive datasets (100M+ rows).
+The fastest, simplest, and most powerful CSV parser for Node.js.
+Optimized for high performance and extreme memory efficiency when
+handling massive datasets (100M+ rows).
 
-`select-csv` converts `.csv` files into arrays, JSON objects, or raw lines. It provides two main functions, `parseCsv` (for local files) and `parseText` (for raw strings), both sharing the same methods and features.
+`select-csv` converts `.csv` files into arrays, JSON objects, or raw
+lines. It provides two main entry points: `parseCsv` (for local files)
+and `parseText` (for raw strings), both sharing the same
+high-performance methods.
 
-##  Key Features
-- **Ultra-Lightweight:** Package size is less than 30 KB.
-- **Fast Mode:** Synchronous execution for maximum speed and zero overhead.
-- **Memory Efficient:** Streams large files using chunks and row offsets instead of loading the entire file into RAM.
-- **Robust Parsing:** Correct handling of complex line-breaks (`\r\n`, `\n`) and nested quotations.
-- **No Dependencies:** Zero external dependencies for maximum security and stability.
-- **Flexible Options:** Highly customizable (headers, quotes, delimiters, buffers).
+------------------------------------------------------------------------
 
----
+## 🌟 Key Features
 
+-   **Ultra-Lightweight:** Minimal package size with zero dependencies.\
+-   **Fast Mode:** Synchronous execution for maximum speed and zero
+    overhead.\
+-   **Memory Efficient:** Streams large files using chunks instead of
+    loading everything into RAM.\
+-   **Smart Tracking:** Remembers its position in the file for seamless
+    sequential reading.\
+-   **Flexible Options:** Highly customizable (headers, json mapping,
+    custom delimiters).
 
-Install:
--------
+------------------------------------------------------------------------
 
-select-csv is available on [npm](https://www.npmjs.com/package/select-csv). It
-can be installed with the following command:
+## Install
 
-    npm install select-csv
+``` bash
+npm install select-csv
+```
 
+------------------------------------------------------------------------
 
+## API Reference & Detailed Examples
 
-Usage:
--------
+### 1. Initialization Functions
 
-Here there are clearly different examples
+#### `parseCsv(file_path, [options])`
 
+-   **file_path** (Required - String): The path to your CSV file.\
+-   **options** (Optional - Object): Configuration for parsing.
 
-```js
-const {parseCsv,parseText} = require("select-csv");
+#### `parseText(text, [options])`
 
-var parse;
+-   **text** (Required - String): The raw CSV content.\
+-   **options** (Optional - Object): Configuration for parsing.
 
-// First create object from .csv file
-parse = parseCsv('file_path.csv');
+------------------------------------------------------------------------
 
-// Or if you just want create object from text
-parse = parseText(
-`Index,User Id,First Name,Last Name,Sex
-1,5f10e9D33fC5f2b,Sara,Mcguire,Female
-2,751cD1cbF77e005,Alisha,Hebert,Male
-3,DcEFDB2D2e62bF9,Gwendolyn,Sheppard,Male
-4,C88661E02EEDA9e,Kristine,Mccann,Female
-5,fafF1aBDebaB2a6,Bobby,Pittman,Female
-6,BdDb6C8Af309202,Calvin,Ramsey,Female
-7,FCdfFf08196f633,Collin,Allison,Male
-8,356279dAa0F7CbD,Nicholas,Branch,Male
-9,F563CcbFBfEcf5a,Emma,Robinson,Female
-10,f2dceFc00F62542,Pedro,Cordova,Male`,
+## ⚙️ The `options` Object (All Optional)
+
+| Property    | Type    | Default | Description |
+|-------------|---------|---------|-------------|
+| header      | Boolean | true    | Treat the first line as column titles. |
+| delimiter   | String  | ","     | Character that separates values. Set to false for raw lines. |
+| linebreak   | String  | "\r\n"  | The character(s) used for line endings. |
+| json        | Boolean | false   | If true, returns rows as Objects instead of Arrays. |
+| bufferSize  | Number  | 1MB     | (File only) Chunk size in bytes read from disk. |
+
+------------------------------------------------------------------------
+
+## 🔍 Detailed Method Examples
+
+### A. `.get()` - Fetch Everything
+
+Returns all rows from the current position to the end of the file.
+
+``` javascript
+const { parseCsv } = require("select-csv");
+const parser = parseCsv('data.csv');
+
+const result = parser.get();
+console.log(result.rows); 
+// Output: [ ["1", "John"], ["2", "Jane"] ]
+```
+
+------------------------------------------------------------------------
+
+### B. `.chunk(size)` - Batch Processing
+
+Reads a specific number of rows and updates the internal cursor. This is
+the best way to handle huge files.
+
+-   **size** (Required - Integer): Number of rows to fetch.
+
+``` javascript
+const parser = parseCsv('huge.csv');
+
+const batch1 = parser.chunk(2); // Gets rows 1 and 2
+const batch2 = parser.chunk(2); // Gets rows 3 and 4
+console.log(batch2.row_count); // 2
+```
+
+------------------------------------------------------------------------
+
+### C. `.rowOffset(from, [to])` - Range Selection
+
+Fetches a range of rows without moving the internal cursor.
+
+-   **from** (Required - Integer): Starting row index (starts at 0).\
+-   **to** (Optional - Integer): Ending row index.
+
+``` javascript
+const parser = parseCsv('data.csv');
+
+// Get rows from index 10 to 15 only
+const specificRows = parser.rowOffset(10, 15);
+```
+
+------------------------------------------------------------------------
+
+### D. `json: true` - Object Mapping
+
+When enabled, each row becomes a JavaScript object using the header as
+keys.
+
+``` javascript
+const parser = parseCsv('users.csv', { header: true, json: true });
+const result = parser.chunk(1);
+
+/* Result: 
 { 
-    linebreak: '\n',
-    header: true 
-}
-);
-
-
-```
-
-* If you want to get all rows :
-```js
-const result = parse.get(); //Return all rows
-/*
-	{
-	Time: "0 ms",
-	header:["Index","User Id","First Name","Last Name","Sex"],
-	rows:[
-		["1","5f10e9D33fC5f2b","Sara","Mcguire","Female"],
-		["2","751cD1cbF77e005","Alisha","Hebert","Male"],
-		["3","DcEFDB2D2e62bF9","Gwendolyn","Sheppard","Male"],
-		["4","C88661E02EEDA9e","Kristine","Mccann","Female"],
-		["5","fafF1aBDebaB2a6","Bobby","Pittman","Female"],
-		["6","BdDb6C8Af309202","Calvin","Ramsey","Female"],
-		["7","FCdfFf08196f633","Collin","Allison","Male"],
-		["8","356279dAa0F7CbD","Nicholas","Branch","Male"],
-		["9","F563CcbFBfEcf5a","Emma","Robinson","Female"],
-		["10","f2dceFc00F62542","Pedro","Cordova","Male"]
-		],
-	row_count:10
-	}
-*/
-
-```
-
-* If you want to get a chunks of rows :
-
-```js
-var result;
-result = parse.chunk(c) 
-//The 'c' parameter must be an integer and greater than or equal to 1
-
-//Examples:
-result = parse.chunk(2) //Return row 0 and 1 
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "1", "5f10e9D33fC5f2b", "Sara", "Mcguire", "Female" ],
-    [ "2", "751cD1cbF77e005", "Alisha", "Hebert", "Male" ]
-  ],
-  "row_count:": 2
-}
-*/
-
-result = parse.chunk(3) //Return row 2,3 and 4 (Get rows from last offset saved)
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "3", "DcEFDB2D2e62bF9", "Gwendolyn", "Sheppard", "Male" ],
-    [ "4", "C88661E02EEDA9e", "Kristine", "Mccann", "Female" ],
-    [ "5", "fafF1aBDebaB2a6", "Bobby", "Pittman", "Female" ]
-  ],
-  "row_count:": 3
-}
-*/
-
-result = parse.chunk(1) //Return row 5 (Get rows from last offset saved)
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ]
-  ],
-  "row_count:": 1
-}
-*/
-
-
-```
-
-* If you want to get specific rows :
-
-```js
-var result
-result = parse.rowOffset(from) 
-// The 'from' parameter must be an integer and greater than or equal to 0
-
-// Or
-result = parse.rowOffset(from,to)
-// The 'to' parameter must be an integer and greater than or equal to 1
-
-//Examples:
-result = parse.rowOffset(6) //Returns all rows from the sixth row to the last row
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "7", "FCdfFf08196f633", "Collin", "Allison", "Male" ],
-    [ "8", "356279dAa0F7CbD", "Nicholas", "Branch", "Male" ],
-    [ "9", "F563CcbFBfEcf5a", "Emma", "Robinson", "Female" ],
-    [ "10", "f2dceFc00F62542", "Pedro", "Cordova", "Male" ]
-  ],
-  "row_count:": 4
-}
-*/
-
-result = parse.rowOffset(5,8) //Returns all rows from 5th to 8th row
-/*
-{
-  Time: "1 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ],
-    [ "7", "FCdfFf08196f633", "Collin", "Allison", "Male" ],
-    [ "8", "356279dAa0F7CbD", "Nicholas", "Branch", "Male" ]
-  ],
-  "row_count:": 3
-}
-*/
-
-
-
-```
-
-* If you want to change the row offset :
-
-```js
-parse.setRowOffset(offs) 
-
-// The 'offs' parameter must be an integer and greater than or equal to 0.
-
-// If the offset exists, return [offset,row_number].
-result = parse.setRowOffset(5) 
-/*
-[236,5]
-*/
-result = parse.chunk(1) // Get rows from last offset saved
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "6", "BdDb6C8Af309202", "Calvin", "Ramsey", "Female" ]
-  ],
-  "row_count:": 1
-}
-*/
-
-// If not , returns false and the offset not changed.
-result = parse.setRowOffset(20) 
-/*
-false
-*/
-result = parse.chunk(1) // Get rows from last offset saved
-/*
-{
-  Time: "0 ms",
-  "Header": [ "Index", "User Id", "First Name", "Last Name", "Sex" ],
-  "Rows": [
-    [ "7", "FCdfFf08196f633", "Collin", "Allison", "Male" ]
-  ],
-  "row_count:": 1
-}
-*/
-
-
-```
-
-* The default object option :
-
-```js
-{
-	'header': true,
-	'quote': false,
-	'linebreak': '\r\n',
-	'delimiter': ",",
-  'bufferSize':1024*1024 
-}
-	// delimiter: (String: get rows containing columns, false: get lines without columns)
-  //bufferSize: It only works with a CSV file, which is the maximum number of characters that can be read at a time, the minimum value is 1024
-```
-
-* If you want to use specific option :
-```js
-var option = {
-	'header': false, 	/* or true */
-	'quote': true, 		/* or false */
-	'linebreak': '\n', 	/* '\n' or '\r' or any other string  */
-	'delimiter': ","	/* ';' or any other string or false */
-  'bufferSize':2000 /* It only works with a CSV file */
-}
-
-var parse;
-// Create object from .csv file
-parse = parseCsv('file_path.csv',option);
-
-// Or if you just want create object from text
-parse = parseText(
-`Index,User Id,First Name,Last Name,Sex
-1,5f10e9D33fC5f2b,Sara,Mcguire,Female
-2,751cD1cbF77e005,Alisha,Hebert,Male
-3,DcEFDB2D2e62bF9,Gwendolyn,Sheppard,Male`
-, option);
-
-option = {
-	'header': false,
-}
-
-result = parse.rowOffset(2)
-/*
-{
-  Time: "0 ms",
-  "Header": false,
-  "Rows": [
-    [ "2", "751cD1cbF77e005", "Alisha", "Hebert", "Male" ]
-  ],
-  "row_count:": 1
-}
-*/
-
-option = { 
-	'header': true,
-	'delimiter': false 
-}
-	// delimiter: (String: get rows containing columns, false: get lines without columns)
-/*
-{
-  Time: "0 ms",
-  "Header": false,
-  "Rows": [
-    [ "2,751cD1cbF77e005,Alisha,Hebert,Male" ] // No columns, just string (all line)
-  ],
-  "row_count:": 1
-}
-*/
-
-```
-
-* If you want to reset option after multiple uses of your code :
-```js
-const option = {       // Just an exapmle
-	'header': false,
-	'quote': true,
-	'linebreak': '\n'
-}
-
-parse.resetOption(option); // All saved values are erased and the object is restared again
-
-
-```
-
-* If you want to get information of your object :
-```js
-
-const result = parse.getInfo();
-/*
-{
-  "offset": 275,
-  "rowOffset": 7,
-  "option": {
-    "header": false,
-    "quote": false,
-    "linebreak": "\n",
-    "delimiter": false
-  }
-}
-*/
-
-```
-
-* Examples of parsing a large CSV file:
-(https://www.kaggle.com/datasets/zanjibar/100-million-data-csv)
-
-
-```js
-
-const parse = parseCsv('100-million-data.csv',{"header": false});
-var result;
-result = parse.chunk(100000)
-/*
-{
-  time: 222,
-  header: false,
-  rows: [
-    [ '198801', '1', '103', '100', '000000190', '0', '35843', '34353' ],
-    [ '198801', '1', '103', '100', '120991000', '0', '1590', '4154' ],
-    [ '198801', '1', '103', '100', '210390900', '0', '4500', '2565' ],
-    .
-    .
-    .
-    [ '198801', '1', '103', '100', '391590000', '0', '95000', '7850' ],
-    [ '198801', '1', '103', '100', '391620000', '0', '1000', '404' ],
-    [ '198801', '1', '103', '100', '391723000', '0', '545', '479' ],
-    [ '198801', '1', '103', '100', '391732100', '0', '24', '393' ],
-    [ '198801', '1', '103', '100', '391732900', '0', '60', '758' ],
-    [ '198801', '1', '103', '100', '391810100', '0', '1935', '1042' ],
-    [ '198801', '1', '103', '100', '391910200', '0', '510', '1303' ],
-    [ '198801', '1', '103', '100', '391910300', '0', '133', '379' ],
-    [ '198801', '1', '103', '100', '391990300', '0', '450', '1668' ],
-    [ '198801', '1', '103', '100', '391990500', '0', '942', '1721' ],
-    [ '198801', '1', '103', '100', '391990900', '0', '40', '235' ],
-    [ '198801', '1', '103', '100', '392030000', '0', '406', '652' ],
-    ... 99900 more items
-  ],
-  row_count: 100000
-}
-*/
-
-result = parse.chunk(3) // Return row 100001,100002 and 100003 (Get rows from last offset saved)
-/*
-{
-  time: 1,
-  header: false,
-  rows: [
-    [ '198801', '1', '326', '500', '841330000', '90', '81', '246' ],
-    [ '198801', '1', '326', '500', '841510000', '0', '35', '1366' ],
-    [ '198801', '1', '326', '500', '841582100', '0', '6', '334' ]
-  ],
-  row_count: 3
-}
-*/
-
-const from = 1000*1000*30;
-const to = from + 5;
-result = parse.rowOffset(from,to)
-/*
-{
-  time: 3743,
-  header: false,
-  rows: [
-    [
-      '199804',    '2',
-      '213',       '502',
-      '848130000', '16035',
-      '746',       '8380'
-    ],
-    [ '199804', '2', '213', '502', '848140000', '168', '152', '1891' ],
-    [ '199804', '2', '213', '502', '848180010', '77', '404', '1366' ],
-    [ '199804', '2', '213', '502', '848190000', '0', '131', '570' ],
-    [ '199804', '2', '213', '502', '848230000', '300', '4', '882' ]
-  ],
-  row_count: 5
-}
-*/
-
-const from = 1000*1000*90;
-const to = from + 4;
-result = parse.rowOffset(from,to)
-/*
-{
-  time: 44126,
-  header: false,
-  rows: [
-    [ '201412', '1', '125', '400', '283525000', '0', '160000', '6492' ],
-    [ '201412', '1', '125', '400', '390740100', '0', '17500', '5579' ],
-    [ '201412', '1', '125', '400', '390950000', '0', '36000', '21423' ],
-    [ '201412', '1', '125', '400', '392329000', '0', '520', '1413' ]
-  ],
-  row_count: 4
-}
-*/
-
-result = parse.chunk(3) // Get rows from last offset saved ( row to,to+1 and to+2 )
-/*
-{
-  time: 29,
-  header: false,
-  rows: [
-    [ '201412', '1', '125', '400', '400932000', '0', '18', '526' ],
-    [ '201412', '1', '125', '400', '401110000', '173', '1735', '1197' ],
-    [ '201412', '1', '125', '400', '401120000', '133', '1707', '1099' ]
-  ],
-  row_count: 3
-}
-*/
-
-result = parse.getInfo() // Get all the information
-/*
-{
-  offset: 3599945660,
-  rowOffset: 90000008,
-  option: {
-    header: false,
-    quote: false,
-    linebreak: '\r\n',
-    delimiter: ',',
-    bufferSize: 1048576
-  }
+  rows: [ { "id": "1", "name": "Sara", "age": "25" } ] 
 }
 */
 ```
 
-## 📄 License
+------------------------------------------------------------------------
 
-MIT License
+### E. `delimiter: false` - Raw Line Reading
+
+If you want to read lines as full strings without splitting them into
+columns.
+
+``` javascript
+const parser = parseCsv('logs.txt', { delimiter: false });
+const result = parser.get();
+// result.rows -> [ "2023-10-01 ERROR: System crash", "2023-10-01 INFO: Rebooting" ]
+```
+
+------------------------------------------------------------------------
+
+### F. `.getInfo()` - Tracking State
+
+Returns the current internal state of the parser.
+
+``` javascript
+
+const info = parse.getInfo();
+console.log(info);
+
+/* Console Output:
+{
+  "offset": 1240,     // Current byte position in file
+  "rowOffset": 10,    // Current row index
+  "option": { ... }   // All active settings
+}
+*/
+```
+------------------------------------------------------------------------
+
+## 🚀 High-Performance Example (100M+ Rows)
+
+This library shines when you need to process millions of rows with
+minimal RAM usage:
+
+``` javascript
+const { parseCsv } = require("select-csv");
+
+const parser = parseCsv('massive_dataset.csv', {
+    header: true,
+    bufferSize: 2 * 1024 * 1024 // 2MB Buffer
+});
+
+let batch;
+while (true) {
+    batch = parser.chunk(100000); // Process 100k rows per loop
+    if (batch.rows.length === 0) break;
+    
+    // Memory stays low (~50MB) even for 10GB files!
+    console.log(`Processing batch... Time taken: ${batch.time}`);
+}
+```
+
+------------------------------------------------------------------------
+
+## License
+
+MIT License - Created with speed in mind.
